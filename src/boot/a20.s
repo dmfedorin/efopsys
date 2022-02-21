@@ -10,7 +10,7 @@
 _a20enabledmsg:
         .asciz "a20 line enabled"
 
-_a20failedmsg:
+_a20failmsg:
         .asciz "failed to enable a20 line"
 
 enablea20:              push    %ax
@@ -36,7 +36,7 @@ _enablea20succ:         mov     $_a20enabledmsg, %bx
 
                         ret
 
-_enablea20fail:         mov     $_a20failedmsg, %bx
+_enablea20fail:         mov     $_a20failmsg, %bx
                         call    error
 
                         pop     %bx

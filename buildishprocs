@@ -1,6 +1,6 @@
 @clean
 {
-        $("rm build/imed/*/*");
+        $("rm build/imed/**/*");
         $("rm build/final/*");
         !("finished cleaning");
 }
