@@ -1,0 +1,52 @@
+@clean
+{
+        $("rm build/imed/*/*");
+        $("rm build/final/*");
+        !("finished cleaning");
+}
+
+@build_boot
+{
+        $("i686-elf-as -o build/imed/boot/boot.o src/boot/boot.s");
+        $("i686-elf-ld --oformat binary -Ttext 0x7c00 -o build/final/boot.bin build/imed/boot/boot.o");
+        !("build bootloader");
+}
+
+@build_kernel
+{
+}
+
+@build_binpad
+{
+        $("i686-elf-as -o build/imed/binpad.o src/binpad.s");
+        $("i686-elf-ld --oformat binary -o build/final/binpad.bin build/imed/binpad.o");
+        !("build binary padding");
+}
+
+@build
+{
+        >(build_boot);
+        >(build_kernel);
+        >(build_binpad);
+        !("finished building");
+}
+
+@makebin
+{
+        $("cat build/final/boot.bin build/final/binpad.bin > build/final/efopsys.bin");
+        !("made OS binary");
+}
+
+@run
+{
+        $("qemu-system-x86_64 -drive format=raw,file=build/final/efopsys.bin -m 1G");
+        !("finished running");
+}
+
+@main
+{
+        >(clean);
+        >(build);
+        >(makebin);
+        >(run);
+}
