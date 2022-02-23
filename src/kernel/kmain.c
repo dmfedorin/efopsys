@@ -1,5 +1,8 @@
+#include "driv/term.h"
+
 void kmain(void)
 {
-        char *vgaptr = (char *)0xb8000;
-        *vgaptr = 'h';
+        struct vgaent ent = {
+                .c = 'h', .attr = vctova(VC_WHITE, VC_BLUE),
+        };
 }
