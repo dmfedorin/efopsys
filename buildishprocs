@@ -14,12 +14,15 @@
 
 @build_kernel
 {
+        %("src/kernel", "i686-elf-gcc -o build/imed/kernel/%.o -c src/kernel/% -ffreestanding");
+        $("i686-elf-gcc -T linker.ld -o build/final/kernel.bin -lgcc -nostdlib -ffreestanding build/imed/kernel/*.o");
+        !("built kernel");
 }
 
 @build_binpad
 {
         $("i686-elf-as -o build/imed/binpad.o src/binpad.s");
-        $("i686-elf-ld --oformat binary -o build/final/binpad.bin build/imed/binpad.o");
+        $("i686-elf-ld --oformat binary -o build/imed/binpad.bin build/imed/binpad.o");
         !("build binary padding");
 }
 
@@ -33,7 +36,7 @@
 
 @makebin
 {
-        $("cat build/final/boot.bin build/final/binpad.bin > build/final/efopsys.bin");
+        $("cat build/final/boot.bin build/final/kernel.bin build/imed/binpad.bin > build/final/efopsys.bin");
         !("made OS binary");
 }
 

@@ -1,7 +1,7 @@
         .ifndef BOOT_S_INCLUDED
         .equ BOOT_S_INCLUDED, 1
 
-        .equ STKBASE, 0x7c00
+        .equ STKBASE,   0x7c00
 
         .code16
 
@@ -22,24 +22,32 @@
 
         .include "src/boot/io.s"
         .include "src/boot/a20.s"
+        .include "src/boot/mem.s"
+        .include "src/boot/pm.s"
 
-_bootmsg:
-        .asciz "entered bootloader"
+        .code16
 
 _bootdisk:
-        .byte 0
+        .byte 0x0
 
-_boot:                  mov     $_bootmsg, %bx
-                        call    log
-
-                        mov     %dl, _bootdisk
+_boot:                  mov     %dl, _bootdisk
 
                         call    enablea20
+                        call    memdetect
 
-                        jmp     .
+                        mov     $0x20, %al
+                        xor     %ch, %ch
+                        mov     $0x2, %cl
+                        xor     %dh, %dh
+                        mov     _bootdisk, %dl
+                        mov     $KERNELADDR, %bx
+
+                        call    rddisk
+
+                        jmp     enterpm
 
         / bootsector identifier
-        .org 510
+        .org 0x1fe
         .word 0xaa55
 
         .endif

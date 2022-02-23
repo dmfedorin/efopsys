@@ -15,7 +15,7 @@ _putsloop:              movb    (%bx), %al
                         int     $0x10
                         inc     %bx
 
-                        cmpb    $0, (%bx)
+                        cmpb    $0x0, (%bx)
                         jne     _putsloop
 
                         pop     %bx
@@ -26,7 +26,7 @@ _putsloop:              movb    (%bx), %al
 _lnend:
         .byte 0xd
         .byte 0xa
-        .byte 0
+        .byte 0x0
 
 / expects bx to hold pointer to null terminated string
 putsln:                 call    puts
@@ -38,21 +38,8 @@ putsln:                 call    puts
 
                         ret
 
-_logpref:
-        .asciz "[...] "
-
-/ expects bx to hold pointer to null terminated log message string
-log:                    push    %bx                        
-                        mov     $_logpref, %bx
-                        call    puts
-                        pop     %bx
-
-                        call    putsln
-
-                        ret
-
 _errpref:
-        .asciz "[..X] "
+        .asciz "[X] "
 
 / expects bx to hold pointer to null terminated error message string
 error:                  push    %bx
@@ -62,6 +49,30 @@ error:                  push    %bx
 
                         call    putsln
 
+                        jmp .
+
+_diskerrmsg:
+        .asciz "failed to read disk"
+
+/ expects al to be the number of sectors to read
+/ expects ch to be the cylinder to read
+/ expects cl to be the sector to start reading from
+/ expects dh to be the head to read from
+/ expects dl to be the disk to read from
+/ expects es:bx to be the disk read destination
+rddisk:                 push    %ax
+                        push    %bx
+
+                        mov     $0x2, %ah
+                        int     $0x13
+                        jc      _rddiskfail
+
+                        pop     %bx
+                        pop     %ax
+
                         ret
+
+_rddiskfail:            mov     $_diskerrmsg, %bx
+                        call    error
 
         .endif
