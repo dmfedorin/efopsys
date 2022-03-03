@@ -1,7 +1,8 @@
         .ifndef BOOT_S_INCLUDED
         .equ BOOT_S_INCLUDED, 1
 
-        .equ STKBASE,   0x7c00
+        .equ STKBASE,       0x7c00
+        .equ KERNELSECTORS, 0x80
 
         .code16
 
@@ -30,12 +31,15 @@
 _bootdisk:
         .byte 0x0
 
+_bootyes:
+        .asciz "yes"
+
 _boot:                  mov     %dl, _bootdisk
 
                         call    enablea20
                         call    memdetect
 
-                        mov     $0x20, %al
+                        mov     $KERNELSECTORS, %al
                         xor     %ch, %ch
                         mov     $0x2, %cl
                         xor     %dh, %dh
@@ -43,6 +47,9 @@ _boot:                  mov     %dl, _bootdisk
                         mov     $KERNELADDR, %bx
 
                         call    rddisk
+
+                        mov     $_bootyes, %bx
+                        call    putsln
 
                         jmp     enterpm
 

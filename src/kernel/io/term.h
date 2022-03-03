@@ -1,6 +1,8 @@
 #ifndef TERM_H_INCLUDED
 #define TERM_H_INCLUDED
 
+#include "port.h"
+
 #include <stdint.h>
 
 enum vgacolor {
@@ -29,6 +31,8 @@ struct vgaent {
 
 void setvgaent(struct vgaent ent, int row, int col);
 
-uint8_t vctova(enum vgacolor fg, enum vgacolor bg);
+uint8_t vctoattr(enum vgacolor fg, enum vgacolor bg);
+
+void setcursorpos(int row, int col);
 
 #endif
